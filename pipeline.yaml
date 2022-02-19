@@ -29,7 +29,7 @@ Parameters:
     NoEcho: true
     MinLength: 40
     MaxLength: 40
-    Default: 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
+    Default: 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
 
 Resources:
   PipelineArtifactsBucket:
