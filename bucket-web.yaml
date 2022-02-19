@@ -16,6 +16,8 @@ Resources:
     Type: "AWS::S3::Bucket"
     Properties:
       BucketName: "lou-lpool-web-123"
+      VersioningConfiguration:
+        Status: Enabled
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
