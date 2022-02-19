@@ -71,7 +71,7 @@ Resources:
                 PollForSourceChanges: false
                 OAuthToken: !Ref GitHubOAuthToken
               RunOrder: 1
-        - Name: Deploy
+        - Name: Deploy-infra
           Actions:
             - Name: CloudFormationDeploy
               ActionTypeId:
@@ -81,13 +81,43 @@ Resources:
                 Version: "1"
               InputArtifacts:
                 - Name: SourceCode
+              OutputArtifacts:
+                - Name: OutputCode
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM
                 RoleArn: !GetAtt CloudformationRole.Arn
                 StackName: !Ref StackName
-                TemplatePath: !Sub "SourceCode::bucket-web.yaml"
+                TemplatePath: "SourceCode::bucket-web.yaml"
               RunOrder: 2
+        - Name: Deploy-web
+          Actions:
+            - Name: DeployWeb
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              InputArtifacts:
+                - Name: OutputCode
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        Image: aws/codebuild/standar:4.0
+        ComputeType: BUILD_GENERAL1_SMALL
+      Source:
+        BuildSpec: buildspec.yml
+        Type: CODEPIPELINE
+      TimeoutInMinutes: 10
+      Name: !Sub ${PipelineName}_build
 
   GithubWebhook:
     Type: "AWS::CodePipeline::Webhook"
@@ -128,3 +158,33 @@ Resources:
           Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess #TODO: Reduce permissions
+
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        {
+          "Statement":
+            [
+              {
+                "Effect": "Allow",
+                "Principal": { "Service": ["codebuild.amazonaws.com"] },
+                "Action": ["sts:AssumeRole"],
+              },
+            ],
+        }
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - lambda:*
+                  - codedeploy:*
+                  - s3:*
