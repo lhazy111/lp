@@ -4,7 +4,7 @@ Description: "Pipeline deploying static website hosting for Learning Pool"
 Parameters:
   StackName:
     Type: String
-    Default: learnig-pool-web
+    Default: learnig-pool-pipeline
   PipelineName:
     Type: String
     Default: LpoolPipepline
@@ -29,7 +29,7 @@ Parameters:
     NoEcho: true
     MinLength: 40
     MaxLength: 40
-    Default: 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
+    Default: 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
 
 Resources:
   PipelineArtifactsBucket:
@@ -56,7 +56,6 @@ Resources:
         - Name: Source
           Actions:
             - Name: Source
-              InputArtifacts: []
               ActionTypeId:
                 Category: Source
                 Owner: ThirdParty
@@ -81,8 +80,7 @@ Resources:
                 Version: "1"
               InputArtifacts:
                 - Name: SourceCode
-              OutputArtifacts:
-                - Name: OutputCode
+              OutputArtifacts: []
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM
@@ -99,9 +97,10 @@ Resources:
                 Provider: CodeBuild
                 Version: "1"
               InputArtifacts:
-                - Name: OutputCode
+                - Name: SourceCode
               Configuration:
                 ProjectName: !Ref CodeBuildProject
+              RunOrder: 3
 
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
