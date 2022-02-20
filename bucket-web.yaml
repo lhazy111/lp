@@ -70,6 +70,11 @@ Resources:
             - PATCH
             - POST
             - PUT
+          Compress: "true"
+          DefaultTTL: 86400
+          MaxTTL: 374400
+          MinTTL: 3600
+          SmoothStreaming: "false"
           TargetOriginId: S3Origin
           ForwardedValues:
             QueryString: false
