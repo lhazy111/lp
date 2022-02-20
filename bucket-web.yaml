@@ -73,7 +73,7 @@ Resources:
           Compress: "true"
           DefaultTTL: 86400
           MaxTTL: 374400
-          MinTTL: 3600
+          MinTTL: 1
           SmoothStreaming: "false"
           TargetOriginId: S3Origin
           ForwardedValues:
