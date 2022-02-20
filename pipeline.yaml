@@ -187,3 +187,4 @@ Resources:
                   - lambda:*
                   - codedeploy:*
                   - s3:*
+                  - cloudfront:*
