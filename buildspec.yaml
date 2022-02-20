@@ -1,13 +1,17 @@
 version: 0.2
 phases:
+  install:
+    commands:
+      - echo Entered the install phase...
+      # Install jq
+      - apt-get update && apt-get install -y curl jq
   build:
     commands:
       - aws s3 cp index.html s3://lou-lpool-web-123
       - aws s3 cp img/ s3://lou-lpool-web-123/img --recursive
-  post-build:
+  post_build:
     commands:
-      # Install jq
-      - apt-get update && apt-get install -y curl jq
+      - echo Invalidating distribution
       # Find the distribution ID for the one with an alias which contains a common token in each environment
       - export DISTRIBUTION_ID=$(aws cloudfront list-distributions | jq -r '.DistributionList.Items | map(select(.Aliases.Items[]  | contains("lou-lpool-web"))) | .[].Id')
       # Invalidate Cache
