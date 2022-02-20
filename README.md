@@ -1,6 +1,4 @@
-Learning Pool static website task 
-Lukasz Hazy
-Different AWS solutions for hosting static website:
+
 
 
 S3 static website with Cloudfront as CDN.
